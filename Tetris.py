@@ -4,24 +4,39 @@
 
 Это временный скриптовый файл.
 """
-
+"""
+1. UI
+2. connect UI and Game
+3. mousemove
+"""
 import sys, random
 
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget
 
-class Window(QWidget):
 
+class GameUI(QWidget):
+
+    def center(self):
+
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+        
     def __init__(self):
         super().__init__()
         
         self.initUI()
 
-
     def initUI(self):
 
-        self.setGeometry(300, 300, 300, 220)
-        self.setWindowTitle('Icon')
+        self.resize(400, 400)
+        self.center()
+        self.setWindowTitle('1010 Deluxe')
         self.show()
+        
+    
+        
 
 class Figure():
     
@@ -42,6 +57,7 @@ class Figure():
 
 class Game():
         
+    __score = 0
     __setfig = []
     def __init__(self, height, width):
         self.__cellfield=[]        
@@ -62,7 +78,11 @@ class Game():
             self.__setfig.append(Figure(fig))
             
     def placefigure(self, x, y, fig):
-        if ((x+fig.size[1]) < self.width) & ((y+fig.size[0]) < self.height):
+        if ((x+fig.size[1]) <= self.width) & ((y+fig.size[0]) <= self.height):
+            for i in range(fig.size[0]):
+                for j in range(fig.size[1]):
+                    if (int(self.__cellfield[y+i][x+j]) + int(fig.shape[i][j]))>1:
+                        return
             for i in range(fig.size[0]):
                 for j in range(fig.size[1]):
                     self.__cellfield[y+i][x+j] = fig.shape[i][j]
@@ -73,9 +93,41 @@ class Game():
         else:
             return Figure.spinfigure(random.choice(self.__setfig))
     
+    def invalidate(self):
+        fullx = []
+        fully = []
+        flipfield = list(zip(*self.__cellfield))
+        
+        for i in range(len(self.__cellfield)):
+            isfullx = False
+            if 0 not in self.__cellfield[i]:
+                isfullx = True
+            if isfullx:
+                fullx.append(i) 
+        
+        for i in range(len(flipfield)):
+            isfully = False
+            if 0 not in flipfield[i]:
+                isfully = True
+            if isfully:
+                fully.append(i)
+        
+        for win in fullx:
+            self.__cellfield[win] = [0]*self.width
+            self.__score+=self.width
+            
+        for win in fully:
+            flipfield[win] = [0]*self.height
+            self.__cellfield = list(zip(*flipfield))
+            self.__score+=self.height
+    
     @property
     def field(self):                       # Чтение
         return self.__cellfield
+    
+    @property
+    def score(self):                       # Чтение
+        return self.__score
     
     @field.setter
     def field(self, value):                # Запись
@@ -88,13 +140,9 @@ class Game():
             self.__cellfield.append([0 for i in range(self.width)])  
     
         
-           
-f = Game(10,10)
-f.placefigure(9,9,f.givefig())
-print(f.field)
 
-"""if __name__ == '__main__':
+if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    ex = Window()
-    sys.exit(app.exec_())"""
+    ex = GameUI()
+    sys.exit(app.exec_())
