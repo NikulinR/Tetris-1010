@@ -29,10 +29,10 @@ class Figure():
         self.shape = shape
         self.__size = [len(shape),len(shape[0])]
     
-    """def spinfigure(self):
-        self.shape = list(zip(self.shape))
-        self.__size = self.__size.reverse()
-        return self"""
+    @staticmethod
+    def spinfigure(self):
+        self = Figure(list(zip(*self.shape)))
+        return self
         
     @property
     def size(self):                       # Чтение
@@ -68,7 +68,10 @@ class Game():
                     self.__cellfield[y+i][x+j] = fig.shape[i][j]
                     
     def givefig(self):
-        return random.choice(self.__setfig)
+        if random.getrandbits(1):
+            return random.choice(self.__setfig)
+        else:
+            return Figure.spinfigure(random.choice(self.__setfig))
     
     @property
     def field(self):                       # Чтение
@@ -87,7 +90,7 @@ class Game():
         
            
 f = Game(10,10)
-f.placefigure(0,0,f.givefig())
+f.placefigure(9,9,f.givefig())
 print(f.field)
 
 """if __name__ == '__main__':
