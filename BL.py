@@ -40,7 +40,7 @@ class Game():
         self.width = width   
         for i in range(height):
             self.__cellfield.append([0 for i in range(width)])  
-        self.__get_figures_fromfile__("Shapes.txt")
+        self.__get_figures_fromfile__("Resourses/Shapes.txt")
     
     def __get_figures_fromfile__(self,path):
         blocks = []

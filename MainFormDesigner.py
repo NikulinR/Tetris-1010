@@ -17,9 +17,9 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
-        MainWindow.setMinimumSize(QtCore.QSize(727, 575))
-        MainWindow.setMaximumSize(QtCore.QSize(727, 575))        
-        icon = QtGui.QIcon("s1200.png")
+        MainWindow.setMinimumSize(QtCore.QSize(727, 600))
+        MainWindow.setMaximumSize(QtCore.QSize(1000, 1000))        
+        icon = QtGui.QIcon("Resourses/s1200.png")
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -48,16 +48,17 @@ class Ui_MainWindow(object):
         self.setfig3.setFrameShadow(QtWidgets.QFrame.Raised)
         self.setfig3.setObjectName("setfig3")
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 727, 21))
-        self.menubar.setObjectName("menubar")
-        self.menuOptions = QtWidgets.QMenu(self.menubar)
-        self.menuOptions.setObjectName("menuOptions")
-        self.menuRules = QtWidgets.QMenu(self.menubar)
-        self.menuRules.setObjectName("menuRules")
-        MainWindow.setMenuBar(self.menubar)
-        self.menubar.addAction(self.menuOptions.menuAction())
-        self.menubar.addAction(self.menuRules.menuAction())
+        
+        self.setOptions = QtWidgets.QPushButton(MainWindow)
+        self.setOptions.setGeometry(QtCore.QRect(10, 555, 75, 23))
+        self.setOptions.setObjectName("Options")
+        
+        self.btnRun = QtWidgets.QPushButton(MainWindow)
+        self.btnRun.setGeometry(QtCore.QRect(90, 555, 75, 23))
+        self.btnRun.setObjectName("Run")
+
+        self.lable = QtWidgets.QLabel(MainWindow)
+        self.lable.setGeometry(QtCore.QRect(200, 555, 75, 23))
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -66,8 +67,8 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "1010 Deluxe!"))
-        self.menuOptions.setTitle(_translate("MainWindow", "Options"))
-        self.menuRules.setTitle(_translate("MainWindow", "Rules"))
-
+        self.setOptions.setText(_translate("MainWindow", "Options"))
+        self.btnRun.setText(_translate("MainWindow", "Run"))
+        self.lable.setText(_translate("MainWindow", "Run"))
     
   

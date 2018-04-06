@@ -47,8 +47,7 @@ class Ui_QSettings(object):
         self.statusbar = QtWidgets.QStatusBar(QSettings)
         self.statusbar.setObjectName("statusbar")
         QSettings.setStatusBar(self.statusbar)
-       
-        
+
         self.retranslateUi(QSettings)
         QtCore.QMetaObject.connectSlotsByName(QSettings)
 
