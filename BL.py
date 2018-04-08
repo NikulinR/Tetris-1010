@@ -28,7 +28,6 @@ class Figure():
     def size(self):                       # Чтение
         return self.__size
         
-        
 
 class Game():
         
