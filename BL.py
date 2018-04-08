@@ -59,7 +59,8 @@ class Game():
                         return
             for i in range(fig.size[0]):
                 for j in range(fig.size[1]):
-                    self.__cellfield[y+i][x+j] = fig.shape[i][j]
+                    if self.__cellfield[y+i][x+j] == 0:    
+                        self.__cellfield[y+i][x+j] = fig.shape[i][j]
                     
     def givefig(self):
         if random.getrandbits(1):

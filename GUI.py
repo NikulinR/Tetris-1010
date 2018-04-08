@@ -29,6 +29,8 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         self.fig3 = None
         self.game = None
         self.chosenFigure = None
+        self.counterfig = 3
+        self.figid = None
 
     
     def setOption_Clicked(self):
@@ -43,6 +45,7 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         self.fig2 = self.game.givefig()
         self.fig3 = self.game.givefig()
         
+        
         self.lScore.setText("start")
         
         
@@ -51,28 +54,47 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
     
     def mousePressEvent(self, e):        
         if e.button() == Qt.LeftButton:  
-            self.lScore.setText("PRESS!!!")
             if (self.setfig1.x() < e.x() < self.setfig1.x()+self.setfig1.width()) & (self.setfig1.y() < e.y() < self.setfig1.y()+self.setfig1.height()):
-                self.lScore.setText("WTF1!!!")
+                figid = 1
                 self.chosenFigure = self.fig1
             if (self.setfig2.x() < e.x() < self.setfig2.x()+self.setfig2.width()) & (self.setfig2.y() < e.y() < self.setfig2.y()+self.setfig2.height()):
-                self.lScore.setText("WTF2!!!")
+                figid = 2
                 self.chosenFigure = self.fig2
             if (self.setfig3.x() < e.x() < self.setfig3.x()+self.setfig3.width()) & (self.setfig3.y() < e.y() < self.setfig3.y()+self.setfig3.height()):
-                self.lScore.setText("WTF3!!!")
+                figid = 3
                 self.chosenFigure = self.fig3
+            else:
+                figid = 0
+                
             
     def mouseMoveEvent(self, e):
-        self.lScore.setText("MOVE!!!")
+        pass
         
     def mouseReleaseEvent(self, e):
-        self.lScore.setText("WTF!!!")
         if self.chosenFigure != None:
             if (self.field.x() < e.x() < self.field.x()+self.field.width()) & (self.field.y() < e.y() < self.field.y()+self.field.height()):   
-                
-                self.game.placefigure(0,0,self.chosenFigure)
-                self.update()
+                i = int((e.x() - self.field.x())//(self.field.width()/width))
+                j = int((e.y() - self.field.y())//(self.field.height()/height))   
+                self.lScore.setText(str((i,j)))
+                self.game.placefigure(i,j,self.chosenFigure)
+                self.counterfig -= 1
+                if self.figid == 1:
+                    self.fig1.shape = []
+                if self.figid == 2:
+                    self.fig2.shape = []
+                if self.figid == 3:
+                    self.fig3.shape = []
+                if self.counterfig == 0:
+                    self.fig1 = self.game.givefig()
+                    self.fig2 = self.game.givefig()
+                    self.fig3 = self.game.givefig()
+                    self.counterfig = 3
+        self.game.invalidate()
+        self.lScore.setText(str(self.game.score))
+        self.update()
         self.chosenFigure = None
+        
+        
         
     
     def paintEvent(self, e):
