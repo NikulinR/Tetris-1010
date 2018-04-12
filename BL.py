@@ -13,8 +13,7 @@
 import random
 
 
-class Figure():
-    
+class Figure():    
     def __init__(self, shape):        
         self.shape = shape
         self.__size = [len(shape),len(shape[0])]
@@ -29,8 +28,7 @@ class Figure():
         return self.__size
         
 
-class Game():
-        
+class Game():        
     __score = 0
     __setfig = []
     def __init__(self, height, width):
@@ -41,9 +39,6 @@ class Game():
             self.__cellfield.append(list(0 for i in range(width)))  
         self.__get_figures_fromfile__("Resourses/Shapes.txt")
         
-            
-        
-        
     
     def __get_figures_fromfile__(self,path):
         blocks = []
@@ -51,19 +46,22 @@ class Game():
         unparsed = f.read()
         unparsed = unparsed.split('\n-\n')
         for fig in unparsed:
-            blocks.append(list(i.split(' ') for i in fig.split('\n')))
+            blocks.append(list(list(map(int, i.split(' '))) for i in fig.split('\n')))
         for fig in blocks:
             self.__setfig.append(Figure(fig))
             
-    def placefigure(self, x, y, fig):
-        if ((x+fig.size[1]) <= self.width) & ((y+fig.size[0]) <= self.height):
+    @staticmethod
+    def placefigure(x, y, fig, field):
+        tmpfield = field.copy()
+        if ((x+fig.size[1]) <= len(field[0])) & ((y+fig.size[0]) <= len(field)):
             for i in range(fig.size[0]):
                 for j in range(fig.size[1]):
-                    if (int(self.__cellfield[y+i][x+j]) + int(fig.shape[i][j]))>1:
-                        return
+                    if (tmpfield[y+i][x+j] + fig.shape[i][j])>1:
+                        return tmpfield
             for i in range(fig.size[0]):
                 for j in range(fig.size[1]):   
-                    self.__cellfield[y+i][x+j] = int(self.__cellfield[y+i][x+j]) + int(fig.shape[i][j]) 
+                    tmpfield[y+i][x+j] += fig.shape[i][j]
+        return tmpfield
                     
     def givefig(self):
         if random.getrandbits(1):

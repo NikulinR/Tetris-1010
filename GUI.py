@@ -1,4 +1,4 @@
-import sys
+import sys,random
 import BL,MainFormDesigner, SettingsDesigner
 from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QFrame
 from PyQt5.QtGui import QPainter, QColor, QFont, QPixmap, QPen
@@ -24,6 +24,8 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         self.pixset3.fill(QColor(0,0,0,0))  
         self.pixfield = QPixmap(self.field.width(),self.field.height())
         self.pixfield.fill(QColor(0,0,0,0)) 
+        self.tmppixfield = QPixmap(self.field.width(),self.field.height())
+        self.tmppixfield.fill(QColor(0,0,0,0)) 
 
     
     def setOption_Clicked(self):
@@ -41,7 +43,7 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         self.counterfig = 3
         
         self.lScore.setText("start")
-        
+        self.color = QColor(random.randint(50,255),random.randint(50,255),random.randint(50,255))
         
         self.update()
     
@@ -59,8 +61,20 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
                 self.chosenFigure = self.fig3
                 
             
-    def mouseMoveEvent(self, e):
-        pass
+    def mouseMoveEvent(self, e):    
+        self.tmppixfield.fill(Qt.white)
+        p = QPainter(self)        
+        sizex = self.tmppixfield.width()/width
+        sizey = self.tmppixfield.height()/height
+        i = int((e.x() - self.field.x())//(self.field.width()/width))
+        j = int((e.y() - self.field.y())//(self.field.height()/height)) 
+        for i in range(len(self.chosenFigure.shape)):
+            for j in range(len(self.chosenFigure.shape[0])):                
+                rect = QRect(j*sizex, i*sizey, sizex, sizey)                
+                if (self.chosenFigure.shape[i][j] == 1):
+                    p.fillRect(rect, self.color)
+        p.drawPixmap(self.field.x(),self.field.y(),self.tmppixfield)
+
         
     def mouseReleaseEvent(self, e):
         if self.chosenFigure != None:
@@ -68,15 +82,8 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
                 i = int((e.x() - self.field.x())//(self.field.width()/width))
                 j = int((e.y() - self.field.y())//(self.field.height()/height))   
                 self.lScore.setText(str((i,j)))
-                self.game.placefigure(i,j,self.chosenFigure)
+                self.game.field = self.game.placefigure(i,j,self.chosenFigure, self.game.field)
                 self.counterfig -= 1
-                """if self.figid == 1:
-                    self.fig1.shape.clear()                    
-                if self.figid == 2:
-                    self.fig2.shape.clear()
-                if self.figid == 3:
-                    self.fig3.shape.clear()
-                self.figid = 0"""
                 if self.counterfig == 0:
                     self.fig1 = self.game.givefig()
                     self.fig2 = self.game.givefig()
@@ -87,26 +94,26 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         self.update()
         self.chosenFigure = None
         
-        
+    
         
     
     def paintEvent(self, e):
         p = QPainter(self)
         if self.fig1:
-            self.drawFigure(self.fig1.shape, self.pixset1)
+            self.drawFigure(self.fig1.shape, self.pixset1, self.color)
         if self.fig2:
-            self.drawFigure(self.fig2.shape, self.pixset2)
+            self.drawFigure(self.fig2.shape, self.pixset2, self.color)
         if self.fig3:
-            self.drawFigure(self.fig3.shape, self.pixset3)
+            self.drawFigure(self.fig3.shape, self.pixset3, self.color)
         if self.game:
-            self.drawFigure(self.game.field, self.pixfield, w=width, h=height)
+            self.drawFigure(self.game.field, self.pixfield, self.color, w=width, h=height)
         
         p.drawPixmap(self.setfig1.x(),self.setfig1.y(),self.pixset1)
         p.drawPixmap(self.setfig2.x(),self.setfig2.y(),self.pixset2)
         p.drawPixmap(self.setfig3.x(),self.setfig3.y(),self.pixset3)
         p.drawPixmap(self.field.x(),self.field.y(),self.pixfield)
         
-    def drawFigure(self, matr, bmap=QPixmap, w=5, h=5):
+    def drawFigure(self, matr, bmap, color, w=5, h=5):
         bmap.fill(QColor(0,0,0,0))
         p = QPainter(bmap)
         
@@ -115,8 +122,8 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         for i in range(len(matr)):
             for j in range(len(matr[0])):                
                 rect = QRect(j*sizex, i*sizey, sizex, sizey)                
-                if (matr[i][j] == 1) or (matr[i][j] == '1'):                    
-                    p.fillRect(rect, Qt.darkGreen)
+                if (matr[i][j] == 1):                    
+                    p.fillRect(rect, color)
                 p.drawRect(rect)
         
     
