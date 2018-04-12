@@ -21,7 +21,7 @@ class Figure():
     
     @staticmethod
     def spinfigure(self):
-        self = Figure(list(zip(*self.shape)))
+        self = Figure(list(map(list, zip(*self.shape))))
         return self
         
     @property
@@ -38,8 +38,12 @@ class Game():
         self.height = height
         self.width = width   
         for i in range(height):
-            self.__cellfield.append([0 for i in range(width)])  
+            self.__cellfield.append(list(0 for i in range(width)))  
         self.__get_figures_fromfile__("Resourses/Shapes.txt")
+        
+            
+        
+        
     
     def __get_figures_fromfile__(self,path):
         blocks = []
@@ -47,7 +51,7 @@ class Game():
         unparsed = f.read()
         unparsed = unparsed.split('\n-\n')
         for fig in unparsed:
-            blocks.append([i.split(' ') for i in fig.split('\n')])
+            blocks.append(list(i.split(' ') for i in fig.split('\n')))
         for fig in blocks:
             self.__setfig.append(Figure(fig))
             
@@ -58,9 +62,8 @@ class Game():
                     if (int(self.__cellfield[y+i][x+j]) + int(fig.shape[i][j]))>1:
                         return
             for i in range(fig.size[0]):
-                for j in range(fig.size[1]):
-                    if self.__cellfield[y+i][x+j] == 0:    
-                        self.__cellfield[y+i][x+j] = fig.shape[i][j]
+                for j in range(fig.size[1]):   
+                    self.__cellfield[y+i][x+j] = int(self.__cellfield[y+i][x+j]) + int(fig.shape[i][j]) 
                     
     def givefig(self):
         if random.getrandbits(1):
@@ -71,7 +74,7 @@ class Game():
     def invalidate(self):
         fullx = []
         fully = []
-        flipfield = list(zip(*self.__cellfield))
+        flipfield = list(map(list, zip(*self.__cellfield)))
         
         for i in range(len(self.__cellfield)):
             isfullx = False
@@ -85,16 +88,18 @@ class Game():
             if 0 not in flipfield[i]:
                 isfully = True
             if isfully:
-                fully.append(i)
+                fully.append(i)        
+        
+            
+        for win in fully:
+            flipfield[win] = [0]*self.height            
+            self.__score+=self.height
+        
+        self.__cellfield = list(map(list, zip(*flipfield)))
         
         for win in fullx:
             self.__cellfield[win] = [0]*self.width
             self.__score+=self.width
-            
-        for win in fully:
-            flipfield[win] = [0]*self.height
-            self.__cellfield = list(zip(*flipfield))
-            self.__score+=self.height
     
     @property
     def field(self):                       # Чтение
@@ -112,4 +117,4 @@ class Game():
     def field(self):
         self.__cellfield = []              # Удаление
         for i in range(self.height):
-            self.__cellfield.append([0 for i in range(self.width)])  
+            self.__cellfield.append(list(0 for i in range(self.width)))  

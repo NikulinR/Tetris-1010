@@ -24,13 +24,6 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         self.pixset3.fill(QColor(0,0,0,0))  
         self.pixfield = QPixmap(self.field.width(),self.field.height())
         self.pixfield.fill(QColor(0,0,0,0)) 
-        self.fig1 = None
-        self.fig2 = None
-        self.fig3 = None
-        self.game = None
-        self.chosenFigure = None
-        self.counterfig = 3
-        self.figid = None
 
     
     def setOption_Clicked(self):
@@ -41,10 +34,11 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         self.game = BL.Game(height, width)
         p = QPainter(self)
         p.setBrush(QColor('green'))
+        self.chosenFigure = None
         self.fig1 = self.game.givefig()
         self.fig2 = self.game.givefig()
         self.fig3 = self.game.givefig()
-        
+        self.counterfig = 3
         
         self.lScore.setText("start")
         
@@ -55,16 +49,14 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
     def mousePressEvent(self, e):        
         if e.button() == Qt.LeftButton:  
             if (self.setfig1.x() < e.x() < self.setfig1.x()+self.setfig1.width()) & (self.setfig1.y() < e.y() < self.setfig1.y()+self.setfig1.height()):
-                figid = 1
+                #self.figid = 1
                 self.chosenFigure = self.fig1
             if (self.setfig2.x() < e.x() < self.setfig2.x()+self.setfig2.width()) & (self.setfig2.y() < e.y() < self.setfig2.y()+self.setfig2.height()):
-                figid = 2
+                #self.figid = 2
                 self.chosenFigure = self.fig2
             if (self.setfig3.x() < e.x() < self.setfig3.x()+self.setfig3.width()) & (self.setfig3.y() < e.y() < self.setfig3.y()+self.setfig3.height()):
-                figid = 3
+                #self.figid = 3
                 self.chosenFigure = self.fig3
-            else:
-                figid = 0
                 
             
     def mouseMoveEvent(self, e):
@@ -78,12 +70,13 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
                 self.lScore.setText(str((i,j)))
                 self.game.placefigure(i,j,self.chosenFigure)
                 self.counterfig -= 1
-                if self.figid == 1:
-                    self.fig1.shape = []
+                """if self.figid == 1:
+                    self.fig1.shape.clear()                    
                 if self.figid == 2:
-                    self.fig2.shape = []
+                    self.fig2.shape.clear()
                 if self.figid == 3:
-                    self.fig3.shape = []
+                    self.fig3.shape.clear()
+                self.figid = 0"""
                 if self.counterfig == 0:
                     self.fig1 = self.game.givefig()
                     self.fig2 = self.game.givefig()
@@ -99,11 +92,14 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
     
     def paintEvent(self, e):
         p = QPainter(self)
-        
-        self.drawFigure(self.fig1.shape, self.pixset1)
-        self.drawFigure(self.fig2.shape, self.pixset2)
-        self.drawFigure(self.fig3.shape, self.pixset3)
-        self.drawFigure(self.game.field, self.pixfield, w=width, h=height)
+        if self.fig1:
+            self.drawFigure(self.fig1.shape, self.pixset1)
+        if self.fig2:
+            self.drawFigure(self.fig2.shape, self.pixset2)
+        if self.fig3:
+            self.drawFigure(self.fig3.shape, self.pixset3)
+        if self.game:
+            self.drawFigure(self.game.field, self.pixfield, w=width, h=height)
         
         p.drawPixmap(self.setfig1.x(),self.setfig1.y(),self.pixset1)
         p.drawPixmap(self.setfig2.x(),self.setfig2.y(),self.pixset2)
@@ -118,10 +114,10 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         sizey = bmap.height()/h
         for i in range(len(matr)):
             for j in range(len(matr[0])):                
-                rect = QRect(j*sizex, i*sizey, sizex, sizey)
+                rect = QRect(j*sizex, i*sizey, sizex, sizey)                
+                if (matr[i][j] == 1) or (matr[i][j] == '1'):                    
+                    p.fillRect(rect, Qt.darkGreen)
                 p.drawRect(rect)
-                if matr[i][j] == '1':                    
-                    p.fillRect(rect, Qt.red)
         
     
 class optionsForm(QMainWindow, SettingsDesigner.Ui_QSettings):
