@@ -23,10 +23,9 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         self.pixset3 = QPixmap(self.setfig3.height(),self.setfig3.width())
         self.pixset3.fill(QColor(0,0,0,0))  
         self.pixfield = QPixmap(self.field.width(),self.field.height())
-        self.pixfield.fill(QColor(0,0,0,0)) 
-        self.tmppixfield = QPixmap(self.field.width(),self.field.height())
-        self.tmppixfield.fill(QColor(0,0,0,0)) 
-
+        self.pixfield.fill(QColor(0,0,0,0))
+        self.tmppixfield = self.pixfield.copy()
+        self.game = None
     
     def setOption_Clicked(self):
         self.setting = optionsForm()
@@ -34,13 +33,11 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
     
     def btnRun_Clicked(self):
         self.game = BL.Game(height, width)
-        p = QPainter(self)
-        p.setBrush(QColor('green'))
         self.chosenFigure = None
         self.fig1 = self.game.givefig()
         self.fig2 = self.game.givefig()
         self.fig3 = self.game.givefig()
-        self.counterfig = 3
+        self.counterfig = 3        
         
         self.lScore.setText("start")
         self.color = QColor(random.randint(50,255),random.randint(50,255),random.randint(50,255))
@@ -51,30 +48,12 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
     def mousePressEvent(self, e):        
         if e.button() == Qt.LeftButton:  
             if (self.setfig1.x() < e.x() < self.setfig1.x()+self.setfig1.width()) & (self.setfig1.y() < e.y() < self.setfig1.y()+self.setfig1.height()):
-                #self.figid = 1
                 self.chosenFigure = self.fig1
             if (self.setfig2.x() < e.x() < self.setfig2.x()+self.setfig2.width()) & (self.setfig2.y() < e.y() < self.setfig2.y()+self.setfig2.height()):
-                #self.figid = 2
                 self.chosenFigure = self.fig2
             if (self.setfig3.x() < e.x() < self.setfig3.x()+self.setfig3.width()) & (self.setfig3.y() < e.y() < self.setfig3.y()+self.setfig3.height()):
-                #self.figid = 3
                 self.chosenFigure = self.fig3
                 
-            
-    def mouseMoveEvent(self, e):    
-        self.tmppixfield.fill(Qt.white)
-        p = QPainter(self)        
-        sizex = self.tmppixfield.width()/width
-        sizey = self.tmppixfield.height()/height
-        i = int((e.x() - self.field.x())//(self.field.width()/width))
-        j = int((e.y() - self.field.y())//(self.field.height()/height)) 
-        for i in range(len(self.chosenFigure.shape)):
-            for j in range(len(self.chosenFigure.shape[0])):                
-                rect = QRect(j*sizex, i*sizey, sizex, sizey)                
-                if (self.chosenFigure.shape[i][j] == 1):
-                    p.fillRect(rect, self.color)
-        p.drawPixmap(self.field.x(),self.field.y(),self.tmppixfield)
-
         
     def mouseReleaseEvent(self, e):
         if self.chosenFigure != None:
@@ -99,14 +78,12 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
     
     def paintEvent(self, e):
         p = QPainter(self)
-        if self.fig1:
-            self.drawFigure(self.fig1.shape, self.pixset1, self.color)
-        if self.fig2:
-            self.drawFigure(self.fig2.shape, self.pixset2, self.color)
-        if self.fig3:
-            self.drawFigure(self.fig3.shape, self.pixset3, self.color)
+        
         if self.game:
             self.drawFigure(self.game.field, self.pixfield, self.color, w=width, h=height)
+            self.drawFigure(self.fig1.shape, self.pixset1, self.color)
+            self.drawFigure(self.fig2.shape, self.pixset2, self.color)
+            self.drawFigure(self.fig3.shape, self.pixset3, self.color)
         
         p.drawPixmap(self.setfig1.x(),self.setfig1.y(),self.pixset1)
         p.drawPixmap(self.setfig2.x(),self.setfig2.y(),self.pixset2)
