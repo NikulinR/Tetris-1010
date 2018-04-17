@@ -1,4 +1,4 @@
-import sys,random
+import sys,random, copy
 import BL,MainFormDesigner, SettingsDesigner
 from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QFrame
 from PyQt5.QtGui import QPainter, QColor, QFont, QPixmap, QPen
@@ -24,8 +24,9 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         self.pixset3.fill(QColor(0,0,0,0))  
         self.pixfield = QPixmap(self.field.width(),self.field.height())
         self.pixfield.fill(QColor(0,0,0,0))
-        self.tmppixfield = self.pixfield.copy()
+        self.tmppixfield = QPixmap(self.field.width(),self.field.height())
         self.game = None
+        self.moved = False
     
     def setOption_Clicked(self):
         self.setting = optionsForm()
@@ -45,7 +46,8 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         self.update()
     
     
-    def mousePressEvent(self, e):        
+    def mousePressEvent(self, e):     
+        self.moved = True
         if e.button() == Qt.LeftButton:  
             if (self.setfig1.x() < e.x() < self.setfig1.x()+self.setfig1.width()) & (self.setfig1.y() < e.y() < self.setfig1.y()+self.setfig1.height()):
                 self.chosenFigure = self.fig1
@@ -55,7 +57,8 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
                 self.chosenFigure = self.fig3
                 
         
-    def mouseReleaseEvent(self, e):
+    def mouseReleaseEvent(self, e):  
+        self.moved = False
         if self.chosenFigure != None:
             if (self.field.x() < e.x() < self.field.x()+self.field.width()) & (self.field.y() < e.y() < self.field.y()+self.field.height()):   
                 i = int((e.x() - self.field.x())//(self.field.width()/width))
@@ -73,8 +76,13 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         self.update()
         self.chosenFigure = None
         
-    
-        
+    def mouseMoveEvent(self, e):
+        if (self.field.x() < e.x() < self.field.x()+self.field.width()) & (self.field.y() < e.y() < self.field.y()+self.field.height()) and self.chosenFigure!=None:   
+                i = int((e.x() - self.field.x())//(self.field.width()/width))
+                j = int((e.y() - self.field.y())//(self.field.height()/height))          
+                self.tmpfield = self.game.placefigure(i,j,self.chosenFigure, self.game.field)
+                self.drawFigure(self.tmpfield, self.tmppixfield, self.color, w=width, h=height, xc=j, yc=i)
+                self.update()
     
     def paintEvent(self, e):
         p = QPainter(self)
@@ -87,21 +95,34 @@ class mainForm(QMainWindow, MainFormDesigner.Ui_MainWindow):
         
         p.drawPixmap(self.setfig1.x(),self.setfig1.y(),self.pixset1)
         p.drawPixmap(self.setfig2.x(),self.setfig2.y(),self.pixset2)
-        p.drawPixmap(self.setfig3.x(),self.setfig3.y(),self.pixset3)
-        p.drawPixmap(self.field.x(),self.field.y(),self.pixfield)
+        p.drawPixmap(self.setfig3.x(),self.setfig3.y(),self.pixset3)    
         
-    def drawFigure(self, matr, bmap, color, w=5, h=5):
+        if self.moved:
+            p.drawPixmap(self.field.x(),self.field.y(),self.tmppixfield)
+            self.lScore.setText("movef")
+        else:
+            p.drawPixmap(self.field.x(),self.field.y(),self.pixfield)
+        
+    def drawFigure(self, matr, bmap, color, w=5, h=5, xc=None, yc=None):
         bmap.fill(QColor(0,0,0,0))
         p = QPainter(bmap)
         
         sizex = bmap.width()/w
-        sizey = bmap.height()/h
+        sizey = bmap.height()/h   
+        
         for i in range(len(matr)):
             for j in range(len(matr[0])):                
                 rect = QRect(j*sizex, i*sizey, sizex, sizey)                
                 if (matr[i][j] == 1):                    
                     p.fillRect(rect, color)
                 p.drawRect(rect)
+                
+        if xc and yc:
+            for i in range(xc, xc+len(self.chosenFigure.shape)):
+                for j in range(yc, yc+len(self.chosenFigure.shape[0])): 
+                    rect = QRect(j*sizex, i*sizey, sizex, sizey)
+                    if self.chosenFigure.shape[i-xc][j-yc]:
+                        p.fillRect(rect, color.darker())
         
     
 class optionsForm(QMainWindow, SettingsDesigner.Ui_QSettings):

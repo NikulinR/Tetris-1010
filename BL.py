@@ -10,7 +10,7 @@
 3. mousemove
 """
 
-import random
+import random,copy
 
 
 class Figure():    
@@ -52,7 +52,7 @@ class Game():
             
     @staticmethod
     def placefigure(x, y, fig, field):
-        tmpfield = field.copy()
+        tmpfield = copy.deepcopy(field)
         if ((x+fig.size[1]) <= len(field[0])) & ((y+fig.size[0]) <= len(field)):
             for i in range(fig.size[0]):
                 for j in range(fig.size[1]):
